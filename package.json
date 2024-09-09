@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "."
+    "url": "git@github.com:slowpoison/file-generator-func.git"
   },
   "devDependencies": {
     "mocha": "^7.2.0"
