@@ -1,8 +1,9 @@
 {
-  "name": "file-generator-func",
-  "version": "1.0.1",
+  "name": "@slowpoison/file-generator-func",
+  "version": "0.0.1",
   "description": "File generator functions",
   "main": "file-generator.js",
+  "access": "public",
   "scripts": {
     "test": "mocha -R spec"
   },
