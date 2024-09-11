@@ -3,7 +3,7 @@ declare module '@slowpoison/file-generator' {
     includeNewLines: boolean,
     initialBufferLength: number,
   }
-  export class FileGenerator {
+  export default class FileGenerator {
     constructor(path: string, userOptions?: FileGeneratorOptions);
     genLines(): Generator<string>;
   }

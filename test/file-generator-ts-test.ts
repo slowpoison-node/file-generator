@@ -1,4 +1,4 @@
-import { FileGenerator } from '@slowpoison/file-generator'
+import FileGenerator from '@slowpoison/file-generator'
 import { describe, it } from "mocha"
 
 // only used for compilation check, and not anything else
