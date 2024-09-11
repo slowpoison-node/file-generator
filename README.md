@@ -1,2 +1,3 @@
-# file-generator-functions
-Node js generator functions for files
+# file-generator
+Node js generator functions for file contents.
+Only lines supported for now.

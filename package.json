@@ -1,18 +1,20 @@
 {
-  "name": "@slowpoison/file-generator-func",
-  "version": "0.0.1",
-  "description": "File generator functions",
+  "name": "@slowpoison/file-generator",
+  "version": "0.0.2",
+  "description": "Yield file contents using generators",
   "main": "file-generator.js",
   "access": "public",
+  "types": "file-generator.d.ts",
   "scripts": {
-    "test": "mocha -R spec"
+    "test": "mocha -R spec && tsc --noEmit"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:slowpoison/file-generator-func.git"
+    "url": "git@github.com:slowpoison/file-generator.git"
   },
   "devDependencies": {
-    "mocha": "^7.2.0"
+    "mocha": "^7.2.0",
+    "typescript": "^5.6.2"
   },
   "keywords": [
     "file",

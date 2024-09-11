@@ -1,5 +1,4 @@
 'use strict';
-
 const fsp = require('fs').promises;
 const defaultOptions = {
   includeNewlines: true,
