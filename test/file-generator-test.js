@@ -4,11 +4,14 @@ const assert = require('assert');
 
 const FileGenerator = require('../file-generator');
 describe('FileGenerator', function() {
-      it('should generate lines', async function() {
+      it('should generate lines given an initial buffer length', async function() {
 
         let fileContent = await fsp.open('test/lines.txt', 'r')
-          .then(fh => fh.readFile())
-          .then(buf => buf.toString());
+          .then(async fh => {
+              await fh.readFile()
+                .then(buf => buf.toString());
+              await fh.close();
+          })
 
         let bufferLengths = [1, 2, 1024];
         bufferLengths.map(async bufferLength => {
@@ -19,6 +22,7 @@ describe('FileGenerator', function() {
             lines.push(line);
           }
           assert.equal(fileContent, lines.join(''), 'buffer size ' + bufferLength);
+
           });
         });
 
@@ -29,10 +33,14 @@ describe('FileGenerator', function() {
           lines.push(line);
         }
 
-        fsp.open('test/lines.txt', 'r')
-          .then(fh => fh.readFile())
-          .then(fileLines =>
-              assert.equal(fileLines.toString(), lines.join("\n") + "\n"));
+        await fsp.open('test/lines.txt', 'r')
+          .then(async fh => {
+            await fh
+              .readFile()
+              .then(fileLines =>
+                  assert.equal(fileLines.toString(), lines.join("\n") + "\n"));
+            await fh.close();
+            })
         });
 
       it('should process a large file correctly', async function() {

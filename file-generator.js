@@ -79,7 +79,6 @@ class FileGenerator {
     } finally {
       await this._fh.close();
       this._fh = null;
-      console.log('closing file handle', this._fh);
     }
   }
 
