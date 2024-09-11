@@ -16,6 +16,7 @@ class FileGenerator {
       throw new Error('Invalid file name');
     this._includeNewlines = this._options.includeNewlines ? 1 : 0;
     this._fileName = fileName;
+    this._fh = null;
   }
 
   /*
@@ -31,49 +32,59 @@ class FileGenerator {
    * the search again.
    */
   async *genLines() {
-    let fh = await fsp.open(this._fileName, 'r');
+    this._fh = await fsp.open(this._fileName, 'r');
     let bufLength = this._options.initialBufferLength;
     let buffer = Buffer.alloc(bufLength);
     let bufEnd = -1;
     let lastNewlinePos;
 
-    do {
-      lastNewlinePos = -1;
-      let bufAvailable = bufLength - bufEnd - 1;
-      let resp = await fh.read(buffer, bufEnd + 1, bufAvailable);
-      bufEnd += resp.bytesRead;
-      if (resp.bytesRead == 0)
-        break;
-
-      let found = false;
-      let newlinePos;
-      while (true) {
-        newlinePos = buffer.indexOf("\n", lastNewlinePos + 1);
-        if (newlinePos > bufEnd || newlinePos == -1)
+    try {
+      do {
+        lastNewlinePos = -1;
+        let bufAvailable = bufLength - bufEnd - 1;
+        let resp = await this._fh.read(buffer, bufEnd + 1, bufAvailable);
+        bufEnd += resp.bytesRead;
+        if (resp.bytesRead == 0)
           break;
-        found = true;
-        yield buffer.toString('utf8', lastNewlinePos + 1, newlinePos + this._includeNewlines);
-        lastNewlinePos = newlinePos;
-      }
 
-      let tempBuffer = buffer;
-      if (resp.bytesRead < bufAvailable) { // we reached eof
-        break;
-      } else if (!found) { // we're not at eof yet. Extend the buffer
-        bufLength *= 2;
-        tempBuffer = Buffer.alloc(bufLength);
-      }
+        let found = false;
+        let newlinePos;
+        while (true) {
+          newlinePos = buffer.indexOf("\n", lastNewlinePos + 1);
+          if (newlinePos > bufEnd || newlinePos == -1)
+            break;
+          found = true;
+          yield buffer.toString('utf8', lastNewlinePos + 1, newlinePos + this._includeNewlines);
+          lastNewlinePos = newlinePos;
+        }
 
-      buffer.copy(tempBuffer, 0, lastNewlinePos + 1, bufEnd + 1);
-      buffer = tempBuffer;
-      bufEnd = bufEnd - lastNewlinePos - 1;
-    } while (true);
+        let tempBuffer = buffer;
+        if (resp.bytesRead < bufAvailable) { // we reached eof
+          break;
+        } else if (!found) { // we're not at eof yet. Extend the buffer
+          bufLength *= 2;
+          tempBuffer = Buffer.alloc(bufLength);
+        }
 
-    // no more bytes to read, generate last part of the string if applicable
-    if (bufEnd > lastNewlinePos)
-      yield buffer.toString('utf8', lastNewlinePos + 1, bufEnd + 1);
+        buffer.copy(tempBuffer, 0, lastNewlinePos + 1, bufEnd + 1);
+        buffer = tempBuffer;
+        bufEnd = bufEnd - lastNewlinePos - 1;
+      } while (true);
 
-    fh.close();
+      // no more bytes to read, generate last part of the string if applicable
+      if (bufEnd > lastNewlinePos)
+        yield buffer.toString('utf8', lastNewlinePos + 1, bufEnd + 1);
+    } catch (e) {
+      throw e;
+    } finally {
+      await this._fh.close();
+      this._fh = null;
+      console.log('closing file handle', this._fh);
+    }
+  }
+
+  fileHandle() {
+    return this._fh;
   }
 }
 

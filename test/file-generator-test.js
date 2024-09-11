@@ -45,4 +45,21 @@ describe('FileGenerator', function() {
           }
           assert.equal(20000, lines);
           });
+
+      it('should clean up file handles', async function() {
+          let fileGen = new FileGenerator('test/lines.txt');
+          // read one line
+          let lineGen = await fileGen.genLines();
+          let str1 = await lineGen.next().then(res => res.value);
+          assert.equal('1\n', str1);
+
+          // do clean-up
+          assert.notEqual(null, fileGen.fileHandle());
+          await lineGen.return();
+          assert.equal(null, fileGen.fileHandle());
+
+          // try reading more
+          let str2 = await lineGen.next().then(res => res.value);
+          assert.equal(undefined, str2);
+          });
     });
