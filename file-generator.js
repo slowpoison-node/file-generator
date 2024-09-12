@@ -75,6 +75,7 @@ class FileGenerator {
       if (bufEnd > lastNewlinePos)
         yield buffer.toString('utf8', lastNewlinePos + 1, bufEnd + 1);
     } catch (e) {
+      console.error('Error from genLines', e);
       throw e;
     } finally {
       await this._fh.close();
